@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+message StartAirQualityDataCollectionRequest {
+  string location_id = 1;
+}
+
+message StartAirQualityDataCollectionResponse {
+  string session_id = 1;
+}
+
+message StopAirQualityDataCollectionRequest {
+  string session_id = 1;
+}
+
+message StopAirQualityDataCollectionResponse {
+  bool success = 1;
+}
+
+message SendAirQualityDataCollectionRequest {
+  string session_id = 1;
+  repeated float data = 2;
+}
+
+message SendAirQualityDataCollectionResponse {
+  bool success = 1;
+}
+
+service AirQualityService {
+  rpc StartAirQualityDataCollection (StartAirQualityDataCollectionRequest) returns (StartAirQualityDataCollectionResponse) {}
+  rpc StopAirQualityDataCollection (StopAirQualityDataCollectionRequest) returns (StopAirQualityDataCollectionResponse) {}
+  rpc SendAirQualityDataCollection (SendAirQualityDataCollectionRequest) returns (SendAirQualityDataCollectionResponse) {}
+}

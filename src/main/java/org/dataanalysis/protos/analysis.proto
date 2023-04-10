@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+
+message SensorData {
+  string sensor_id = 1;
+  string type = 2;
+  map<string, double> data = 3;
+}
+
+service DataAnalysisService {
+  rpc ReceiveSensorsData(SensorData) returns (AnalysisResult) {}
+}
+
+message AnalysisResult {
+  string status = 1;
+  string message = 2;
+}
