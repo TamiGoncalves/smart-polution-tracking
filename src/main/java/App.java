@@ -69,9 +69,9 @@ public class App extends JFrame {
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 20));
         buttonPanel.setBackground(Color.GRAY);
 
-        JButton startWaterQualityMonitoring = new JButton("Button 1");
-        JButton startairQualityMonitoring = new JButton("Button 2");
-        JButton button3 = new JButton("Button 3");
+        JButton startWaterQualityMonitoring = new JButton("Start Air Quality");
+        JButton startairQualityMonitoring = new JButton("Start Water Quality");
+        JButton button3 = new JButton("Start Analysis");
 
         buttonPanel.add(startWaterQualityMonitoring);
         buttonPanel.add(startairQualityMonitoring);
