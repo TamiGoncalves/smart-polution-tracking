@@ -14,6 +14,7 @@ repositories {
 dependencies {
     implementation("com.google.protobuf:protobuf-java:3.21.7")
     runtimeOnly 'io.grpc:grpc-netty-shaded:1.54.0'
+    implementation 'org.jmdns:jmdns:3.5.8'
     implementation 'io.grpc:grpc-protobuf:1.54.0'
     implementation 'io.grpc:grpc-stub:1.54.0'
     compileOnly 'org.apache.tomcat:annotations-api:6.0.53' // necessary for Java 9+
