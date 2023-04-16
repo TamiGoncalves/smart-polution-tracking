@@ -1,20 +1,21 @@
 package airquality;
 
-import airquality.AirQualityServiceGrpc;
-import airquality.Airquality;
+import hooks.ServiceEventListener;
+import io.grpc.Grpc;
+import io.grpc.InsecureServerCredentials;
+import io.grpc.Server;
 import io.grpc.stub.StreamObserver;
-import session.Session;
 import session.SessionManager;
 
-import java.beans.beancontext.BeanContextServicesListener;
-import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
 public class AirQualityService extends AirQualityServiceGrpc.AirQualityServiceImplBase {
     SessionManager sessionManager;
-    private ServiceListener serviceListener;
+    private ServiceEventListener serviceListener;
+    private Server server;
 
 
-    public void setServiceListener(ServiceListener serviceListener) {
+    public void setServiceListener(ServiceEventListener serviceListener) {
         this.serviceListener = serviceListener;
     }
 
@@ -44,7 +45,7 @@ public class AirQualityService extends AirQualityServiceGrpc.AirQualityServiceIm
     @Override
     public void sendAirQualityDataCollection(Airquality.SendAirQualityDataCollectionRequest request, StreamObserver<Airquality.SendAirQualityDataCollectionResponse> responseObserver) {
         super.sendAirQualityDataCollection(request, responseObserver);
-        // Generate sensor data
+        // Send data to sensor
 
     }
 
@@ -52,5 +53,20 @@ public class AirQualityService extends AirQualityServiceGrpc.AirQualityServiceIm
     public AirQualityService() {
         super();
         sessionManager = SessionManager.getInstance();
+    }
+
+    public void startServer(String port) throws Exception{
+        this.server = Grpc.newServerBuilderForPort(Integer.parseInt(port), InsecureServerCredentials.create())
+                .addService(this)
+                .build()
+                .start();
+
+    }
+
+
+    public void stop() throws InterruptedException {
+        if (server != null) {
+            server.shutdown().awaitTermination(30, TimeUnit.SECONDS);
+        }
     }
 }
