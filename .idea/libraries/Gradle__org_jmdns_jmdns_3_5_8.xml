@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: org.jmdns:jmdns:3.5.8" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.jmdns" artifactId="jmdns" version="3.5.8" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jmdns/jmdns/3.5.8/e8e3f073800dc5a116421c6104fec360ece3d1bb/jmdns-3.5.8.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jmdns/jmdns/3.5.8/24f9cc1210cf91a8792f7c03fb3e3e0b89abeb15/jmdns-3.5.8-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+service WaterQualityService {
+  // RPC for starting water quality data collection
+  rpc StartWaterQualityDataCollection (StartWaterQualityDataCollectionRequest) returns (StartWaterQualityDataCollectionResponse) {}
+
+  // RPC for stopping water quality data collection
+  rpc StopWaterQualityDataCollection (StopWaterQualityDataCollectionRequest) returns (StopWaterQualityDataCollectionResponse) {}
+
+  // RPC for sending collected water quality data
+  rpc SendWaterQualityDataCollection (SendWaterQualityDataCollectionRequest) returns (SendWaterQualityDataCollectionResponse) {}
+}
+
+// Request for starting water quality data collection
+message StartWaterQualityDataCollectionRequest {
+  string location_id = 1;
+}
+
+// Response for starting water quality data collection
+message StartWaterQualityDataCollectionResponse {
+  string session_id = 1;
+}
+
+// Request for stopping water quality data collection
+message StopWaterQualityDataCollectionRequest {
+  string session_id = 1;
+}
+
+// Response for stopping water quality data collection
+message StopWaterQualityDataCollectionResponse {
+  bool success = 1;
+}
+
+// Request for sending collected water quality data
+message SendWaterQualityDataCollectionRequest {
+  string session_id = 1;
+  repeated float data = 2;
+}
+
+// Response for sending collected water quality data
+message SendWaterQualityDataCollectionResponse {
+  bool success = 1;
+}

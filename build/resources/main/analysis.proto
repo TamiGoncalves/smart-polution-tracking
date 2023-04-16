@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+message SensorData {
+  string sensor_id = 1;
+  string type = 2;
+  map<string, int32> data = 3;
+}
+
+message EnvironmentalData {
+  string Air_Quality = 1;
+  string Water_Quality = 2;
+  map<string, int32> Maximum_Indices = 3;
+  map<string, float> Minimum_Indices = 4;
+  repeated HistoryData History_Data = 5;
+}
+
+message HistoryData {
+  string timestamp = 1;
+  string Air_Quality = 2;
+  string Water_Quality = 3;
+  int32 Level_NO2 = 4;
+  float Level_CH4 = 5;
+  float Level_HCNM = 6;
+  float Level_O3 = 7;
+  int32 SO2_level = 8;
+}
+
+message DataSensor {
+  string sensor_type = 1;
+  string sensor_id = 2;
+  string factor_id = 3;
+  string date_time = 4;
+  float limit_factor_max = 5;
+  float min_limit_factor = 6;
+}
+
+message SensorStatus {
+  string sensor_type = 1;
+  string sensor_id = 2;
+  string date_time = 3;
+  bool status = 4;
+}
+
+
+message Empty {}
+
+service DataAnalysisService {
+  rpc ReceiveSensorsData(SensorData) returns (Empty) {}
+  rpc UpdateEnvironmentalPage(EnvironmentalData) returns (Empty) {}
+  rpc UpdateSensorStatus(stream DataSensor) returns (stream SensorStatus) {}
+}
