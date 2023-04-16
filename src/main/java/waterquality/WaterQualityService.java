@@ -1,10 +1,23 @@
 package waterquality;
 
+import hooks.ServiceEventListener;
+import io.grpc.Grpc;
+import io.grpc.InsecureServerCredentials;
+import io.grpc.Server;
 import io.grpc.stub.StreamObserver;
 import session.SessionManager;
 
+import java.util.concurrent.TimeUnit;
+
 public class WaterQualityService extends WaterQualityServiceGrpc.WaterQualityServiceImplBase{
     SessionManager sessionManager;
+
+
+    private ServiceEventListener serviceListener;
+
+    public void setServiceListener(ServiceEventListener serviceListener) {
+        this.serviceListener = serviceListener;
+    }
     @Override
     public void startWaterQualityDataCollection(Waterquality.StartWaterQualityDataCollectionRequest request, StreamObserver<Waterquality.StartWaterQualityDataCollectionResponse> responseObserver) {
         super.startWaterQualityDataCollection(request, responseObserver);
@@ -41,5 +54,22 @@ public class WaterQualityService extends WaterQualityServiceGrpc.WaterQualitySer
     public WaterQualityService() {
         super();
         sessionManager = SessionManager.getInstance();
+    }
+
+    Server server;
+
+    public void startServer(String port) throws Exception{
+        this.server = Grpc.newServerBuilderForPort(Integer.parseInt(port), InsecureServerCredentials.create())
+                .addService(this)
+                .build()
+                .start();
+
+    }
+
+
+    public void stop() throws InterruptedException {
+        if (server != null) {
+            server.shutdown().awaitTermination(30, TimeUnit.SECONDS);
+        }
     }
 }

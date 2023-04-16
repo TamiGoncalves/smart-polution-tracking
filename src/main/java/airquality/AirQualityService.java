@@ -1,13 +1,23 @@
 package airquality;
 
+import airquality.AirQualityServiceGrpc;
+import airquality.Airquality;
 import io.grpc.stub.StreamObserver;
 import session.Session;
 import session.SessionManager;
 
+import java.beans.beancontext.BeanContextServicesListener;
 import java.util.HashMap;
 
-public class AirQualityService extends AirQualityServiceGrpc.AirQualityServiceImplBase{
+public class AirQualityService extends AirQualityServiceGrpc.AirQualityServiceImplBase {
     SessionManager sessionManager;
+    private ServiceListener serviceListener;
+
+
+    public void setServiceListener(ServiceListener serviceListener) {
+        this.serviceListener = serviceListener;
+    }
+
     @Override
     public void startAirQualityDataCollection(Airquality.StartAirQualityDataCollectionRequest request, StreamObserver<Airquality.StartAirQualityDataCollectionResponse> responseObserver) {
         super.startAirQualityDataCollection(request, responseObserver);
