@@ -1,9 +1,15 @@
+package ui;
+
+import airquality.AirQualityService;
+import hooks.ServiceEventListener;
+import waterquality.WaterQualityService;
+
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
 
-public class App extends JFrame implements ServiceListener {
+public class App extends JFrame implements ServiceEventListener {
 
     // User interface
     JPanel column1 = new JPanel();
@@ -19,6 +25,9 @@ public class App extends JFrame implements ServiceListener {
     private ServiceHost wHost = null;
     private ServiceHost aHost = null;
     private ServiceHost anHost = null;
+
+    private final WaterQualityService waterQualityService = new WaterQualityService();
+    private final AirQualityService airQualityService = new AirQualityService();
 
 
 
@@ -91,10 +100,10 @@ public class App extends JFrame implements ServiceListener {
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
         buttonPanel.setBackground(Color.GRAY);
 
-        JButton startWaterQualityMonitoring = new JButton("Start Air Quality");
+        JButton startWaterQualityMonitoring = new JButton("Start Water Quality");
         toggleButtonColor("Water quality", startWaterQualityMonitoring, true);
-        JButton startairQualityMonitoring = new JButton("Start Water Quality");
-        toggleButtonColor("Air quality", startWaterQualityMonitoring, true);
+        JButton startairQualityMonitoring = new JButton("Start Air Quality");
+        toggleButtonColor("Air quality", startairQualityMonitoring, true);
         JButton startAnalysis = new JButton("Start Analysis");
         toggleButtonColor("Analysis", startAnalysis, true);
 
@@ -109,7 +118,12 @@ public class App extends JFrame implements ServiceListener {
             if(aHost != null) {
                 startairQualityMonitoring.setText("Stop Air Monitoring");
                 toggleButtonColor("Air quality", startairQualityMonitoring, false);
-
+                airQualityService.setServiceListener(this);
+                try {
+                    airQualityService.startServer(aHost.getPort());
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
 
@@ -118,6 +132,11 @@ public class App extends JFrame implements ServiceListener {
             if (startWaterQualityMonitoring.getForeground().equals(Color.RED)) {
                 startWaterQualityMonitoring.setText("Start Water Monitoring");
                 toggleButtonColor("", startWaterQualityMonitoring, true);
+                try {
+                    waterQualityService.stop();
+                } catch (InterruptedException ignore) {
+
+                }
                 return;
             }
 
@@ -125,14 +144,21 @@ public class App extends JFrame implements ServiceListener {
             if(wHost != null) {
                 startWaterQualityMonitoring.setText("Stop Water Monitoring");
                 toggleButtonColor("Water quality", startWaterQualityMonitoring, false);
+                waterQualityService.setServiceListener(this);
+                try {
+                    waterQualityService.startServer(wHost.getPort());
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
 
         startAnalysis.addActionListener(actionEvent -> {
 
             if (startAnalysis.getForeground().equals(Color.RED)) {
-                startAnalysis.setText("Start Water Monitoring");
+                startAnalysis.setText("Start Analysis");
                 toggleButtonColor("", startAnalysis, true);
+
                 return;
             }
 
@@ -212,7 +238,7 @@ public class App extends JFrame implements ServiceListener {
 
 
     public static ServiceHost getServiceHost() {
-        String location = JOptionPane.showInputDialog(null, "Enter the host name:", "Service Host", JOptionPane.PLAIN_MESSAGE);
+        String location = JOptionPane.showInputDialog(null, "Enter the Location ID:", "Location ID", JOptionPane.PLAIN_MESSAGE);
         if (location.length() == 0 ) {
             JOptionPane.showMessageDialog(null, "Invalid location.", "Error", JOptionPane.ERROR_MESSAGE);
             return null;
