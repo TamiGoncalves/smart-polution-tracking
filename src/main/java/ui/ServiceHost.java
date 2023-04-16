@@ -1,3 +1,5 @@
+package ui;
+
 public class ServiceHost {
     private String host;
     private String port;
