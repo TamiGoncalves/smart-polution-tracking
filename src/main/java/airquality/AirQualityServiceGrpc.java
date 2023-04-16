@@ -12,7 +12,7 @@ public final class AirQualityServiceGrpc {
 
   private AirQualityServiceGrpc() {}
 
-  public static final String SERVICE_NAME = "AirQualityService";
+  public static final String SERVICE_NAME = "airquality.AirQualityService";
 
   // Static method descriptors that strictly reflect the proto.
   private static volatile io.grpc.MethodDescriptor<Airquality.StartAirQualityDataCollectionRequest,
@@ -179,7 +179,7 @@ public final class AirQualityServiceGrpc {
   }
 
   /**
-   * Base class for the server implementation of the service AirQualityService.
+   * Base class for the server implementation of the service airquality.AirQualityService.
    */
   public static abstract class AirQualityServiceImplBase
       implements io.grpc.BindableService, AsyncService {
@@ -190,7 +190,7 @@ public final class AirQualityServiceGrpc {
   }
 
   /**
-   * A stub to allow clients to do asynchronous rpc calls to service AirQualityService.
+   * A stub to allow clients to do asynchronous rpc calls to service airquality.AirQualityService.
    */
   public static final class AirQualityServiceStub
       extends io.grpc.stub.AbstractAsyncStub<AirQualityServiceStub> {
@@ -231,7 +231,7 @@ public final class AirQualityServiceGrpc {
   }
 
   /**
-   * A stub to allow clients to do synchronous rpc calls to service AirQualityService.
+   * A stub to allow clients to do synchronous rpc calls to service airquality.AirQualityService.
    */
   public static final class AirQualityServiceBlockingStub
       extends io.grpc.stub.AbstractBlockingStub<AirQualityServiceBlockingStub> {
@@ -269,7 +269,7 @@ public final class AirQualityServiceGrpc {
   }
 
   /**
-   * A stub to allow clients to do ListenableFuture-style rpc calls to service AirQualityService.
+   * A stub to allow clients to do ListenableFuture-style rpc calls to service airquality.AirQualityService.
    */
   public static final class AirQualityServiceFutureStub
       extends io.grpc.stub.AbstractFutureStub<AirQualityServiceFutureStub> {
@@ -395,7 +395,7 @@ public final class AirQualityServiceGrpc {
 
     @Override
     public com.google.protobuf.Descriptors.ServiceDescriptor getServiceDescriptor() {
-      return getFileDescriptor().findServiceByName("AirQualityService");
+      return getFileDescriptor().findServiceByName("airquality.AirQualityService");
     }
   }
 
