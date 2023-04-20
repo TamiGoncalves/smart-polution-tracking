@@ -1,10 +1,13 @@
 package ui;
 
 import airquality.AirQualityService;
+import analysis.AnalysisService;
 import hooks.ServiceEventListener;
 import waterquality.WaterQualityService;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
@@ -17,7 +20,8 @@ public class App extends JFrame implements ServiceEventListener {
     JPanel column3 = new JPanel();
 
     // Table properties
-    String[] sensorHeader = {"v1", "v2", "v3", "v4", "v5"};
+    String[] sensorHeader = {"NO2", "CH4", "HCNM", "O3", "SO2"};
+    ArrayList<String> sensorValues = new ArrayList<>();
     DefaultTableModel waterModel = new DefaultTableModel(sensorHeader, 0);
     DefaultTableModel waterQModel = new DefaultTableModel(sensorHeader, 0);
 
@@ -28,6 +32,9 @@ public class App extends JFrame implements ServiceEventListener {
 
     private final WaterQualityService waterQualityService = new WaterQualityService();
     private final AirQualityService airQualityService = new AirQualityService();
+    private final AnalysisService analysisService = new AnalysisService();
+
+    private boolean analysisServiceStarted = false;
 
 
 
@@ -112,6 +119,11 @@ public class App extends JFrame implements ServiceEventListener {
             if (startairQualityMonitoring.getForeground().equals(Color.RED)) {
                 startairQualityMonitoring.setText("Start Air Monitoring");
                 toggleButtonColor("", startairQualityMonitoring, true);
+                try {
+                    airQualityService.stop();
+                } catch (InterruptedException ignore) {
+                    JOptionPane.showMessageDialog(null, ignore.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                }
                 return;
             }
             aHost = getServiceHost();
@@ -135,7 +147,7 @@ public class App extends JFrame implements ServiceEventListener {
                 try {
                     waterQualityService.stop();
                 } catch (InterruptedException ignore) {
-
+                    JOptionPane.showMessageDialog(null, ignore.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 }
                 return;
             }
@@ -149,6 +161,7 @@ public class App extends JFrame implements ServiceEventListener {
                     waterQualityService.startServer(wHost.getPort());
                 } catch (Exception e) {
                     JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    wHost = null;
                 }
             }
         });
@@ -158,14 +171,31 @@ public class App extends JFrame implements ServiceEventListener {
             if (startAnalysis.getForeground().equals(Color.RED)) {
                 startAnalysis.setText("Start Analysis");
                 toggleButtonColor("", startAnalysis, true);
-
+                try {
+                    analysisService.stop();
+                    analysisServiceStarted = false;
+                } catch (InterruptedException ignore) {
+                    JOptionPane.showMessageDialog(null, ignore.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    analysisServiceStarted = true;
+                }
                 return;
             }
 
             anHost = getServiceHost();
-            if(aHost != null) {
+            if(anHost != null) {
                 startAnalysis.setText("Stop Analysis");
                 toggleButtonColor("Analysis quality", startAnalysis, false);
+            }
+
+
+            try {
+                analysisService.startServer(anHost.getPort());
+                analysisServiceStarted = true;
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                anHost = null;
+                analysisServiceStarted = false;
+
             }
         });
 
@@ -176,6 +206,61 @@ public class App extends JFrame implements ServiceEventListener {
         column1.add(bannerLabel, BorderLayout.NORTH);
         column1.add(buttonPanel, BorderLayout.CENTER);
 
+    }
+
+
+    public static String calculateAirQuality(double no2Level) {
+        int aqi;
+        String category;
+
+        if (no2Level >= 0 && no2Level <= 53) {
+            aqi = (int) Math.round((50.0/53.0)*(no2Level));
+            category = "Good";
+        } else if (no2Level >= 54 && no2Level <= 100) {
+            aqi = (int) Math.round(((100.0-51.0)/(100.0-54.0))*(no2Level-54.0)+51.0);
+            category = "Moderate";
+        } else if (no2Level >= 101 && no2Level <= 360) {
+            aqi = (int) Math.round(((150.0-101.0)/(360.0-101.0))*(no2Level-101.0)+101.0);
+            category = "Unhealthy for Sensitive Groups";
+        } else if (no2Level >= 361 && no2Level <= 649) {
+            aqi = (int) Math.round(((200.0-151.0)/(649.0-361.0))*(no2Level-361.0)+151.0);
+            category = "Unhealthy";
+        } else if (no2Level >= 650 && no2Level <= 1249) {
+            aqi = (int) Math.round(((300.0-201.0)/(1249.0-650.0))*(no2Level-650.0)+201.0);
+            category = "Very Unhealthy";
+        } else {
+            aqi = (int) Math.round(((500.0-301.0)/(2049.0-1250.0))*(no2Level-1250.0)+301.0);
+            category = "Hazardous";
+        }
+
+        return "AQI: " + aqi + " (" + category + ")";
+    }
+
+    public static String calculateWaterQuality(double no2Level) {
+        int aqi;
+        String category;
+
+        if (no2Level >= 0 && no2Level <= 53) {
+            aqi = (int) Math.round((50.0/53.0)*(no2Level));
+            category = "Good";
+        } else if (no2Level >= 54 && no2Level <= 100) {
+            aqi = (int) Math.round(((100.0-51.0)/(100.0-54.0))*(no2Level-54.0)+51.0);
+            category = "Moderate";
+        } else if (no2Level >= 101 && no2Level <= 360) {
+            aqi = (int) Math.round(((150.0-101.0)/(360.0-101.0))*(no2Level-101.0)+101.0);
+            category = "Unhealthy for Sensitive Groups";
+        } else if (no2Level >= 361 && no2Level <= 649) {
+            aqi = (int) Math.round(((200.0-151.0)/(649.0-361.0))*(no2Level-361.0)+151.0);
+            category = "Unhealthy";
+        } else if (no2Level >= 650 && no2Level <= 1249) {
+            aqi = (int) Math.round(((300.0-201.0)/(1249.0-650.0))*(no2Level-650.0)+201.0);
+            category = "Very Unhealthy";
+        } else {
+            aqi = (int) Math.round(((500.0-301.0)/(2049.0-1250.0))*(no2Level-1250.0)+301.0);
+            category = "Hazardous";
+        }
+
+        return "WQI: " + aqi + " (" + category + ")";
     }
 
 
@@ -191,18 +276,32 @@ public class App extends JFrame implements ServiceEventListener {
         buttonPanel.setBackground(Color.GRAY);
 
         JButton addDataBtn = new JButton("Add Air Sensor Values");
-
+        JLabel airqualityLabel = new JLabel("AIR QUALITY:");
+        airqualityLabel.setForeground(Color.WHITE);
+        final float[] average = {0};
+        AtomicInteger count= new AtomicInteger();
+        final int[] sum = {0};
         addDataBtn.addActionListener(e->{
-            Object[] sensorValuesFromUser = getSensorValuesFromUser();
-            if (sensorValuesFromUser != null) {
-                waterModel.addRow(sensorValuesFromUser);
+            String[] V = getSensorValuesFromUser();
+            if (V != null) {
+                count.getAndIncrement();
+                sum[0] += Integer.parseInt(V[0]);
+                average[0] = (float) sum[0] / count.get();
+                if (analysisServiceStarted)airqualityLabel.setText("AIR QUALITY: " + calculateAirQuality(average[0]));
+                waterModel.addRow(V);
             }
         });
 
         buttonPanel.add(addDataBtn);
 
+        JPanel bannerPanel = new JPanel();
+        bannerPanel.setBackground(Color.BLUE);
+        airqualityLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        bannerPanel.add(airqualityLabel);
+
         column2.add(buttonPanel, BorderLayout.NORTH);
         column2.add(scrollPane, BorderLayout.CENTER);
+        column2.add(bannerPanel, BorderLayout.SOUTH);
     }
 
 
@@ -218,10 +317,18 @@ public class App extends JFrame implements ServiceEventListener {
         btnPanel.setBackground(Color.GRAY);
 
         JButton addDataBtn = new JButton("Add Water Sensor Values");
-
+        JLabel waterQualityLabel = new JLabel("WATER QUALITY:");
+        waterQualityLabel.setForeground(Color.WHITE);
+        final float[] average = {0};
+        AtomicInteger count= new AtomicInteger();
+        final int[] sum = {0};
         addDataBtn.addActionListener(e->{
-            Object[] sensorValuesFromUser = getSensorValuesFromUser();
+            String[] sensorValuesFromUser = getSensorValuesFromUser();
             if (sensorValuesFromUser != null) {
+                count.getAndIncrement();
+                sum[0] += Integer.parseInt(sensorValuesFromUser[0]);
+                average[0] = (float) sum[0] / count.get();
+                if (analysisServiceStarted)waterQualityLabel.setText("WATER QUALITY: " + calculateWaterQuality(average[0]));
                 waterQModel.addRow(sensorValuesFromUser);
             }
         });
@@ -232,7 +339,14 @@ public class App extends JFrame implements ServiceEventListener {
 
         JScrollPane scrollPane = new JScrollPane(table);
 
+
+        JPanel bannerPanel = new JPanel();
+        bannerPanel.setBackground(Color.BLUE);
+        waterQualityLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        bannerPanel.add(waterQualityLabel);
+
         column3.add(scrollPane, BorderLayout.CENTER);
+        column3.add(bannerPanel, BorderLayout.SOUTH);
     }
 
 
